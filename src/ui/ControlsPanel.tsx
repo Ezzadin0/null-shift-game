@@ -2,20 +2,27 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useGameStore } from '../stores/gameStore'
 import { UIButton } from './UIButton'
+import { Bilingual } from './Bilingual'
+import { COPY } from './copy'
 import type { Quality } from '../types'
-
-const CONTROLS: Array<{ action: string; keys: string[] }> = [
-  { action: 'Steer', keys: ['W A S D', '← ↑ ↓ →', 'MOUSE'] },
-  { action: 'Shift reality', keys: ['SPACE'] },
-  { action: 'Overdrive (meter full)', keys: ['SHIFT'] },
-  { action: 'Pause / resume', keys: ['P', 'ESC'] },
-  { action: 'Restart (after collapse)', keys: ['R'] },
-  { action: 'Skip intro', keys: ['SPACE', 'ENTER'] },
-]
 
 interface ControlsPanelProps {
   onClose: () => void
   showSettings?: boolean
+}
+
+const settingLabel = (key: string) => COPY.controls.settings.find((s) => s.key === key)!
+
+function SettingLabel({ settingKey }: { settingKey: string }) {
+  const l = settingLabel(settingKey)
+  return (
+    <span>
+      {l.en}
+      <span className="label-ar" dir="rtl" lang="ar">
+        {l.ar}
+      </span>
+    </span>
+  )
 }
 
 export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelProps) {
@@ -38,11 +45,21 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
       exit={{ opacity: 0, y: 24, scale: 0.97 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
     >
-      <h2>Protocol // Controls</h2>
+      <h2>
+        {COPY.controls.headingEn}
+        <span className="ar" dir="rtl" lang="ar">
+          {COPY.controls.headingAr}
+        </span>
+      </h2>
       <div className="panel-rows">
-        {CONTROLS.map((c) => (
-          <div className="control-row" key={c.action}>
-            <span>{c.action}</span>
+        {COPY.controls.rows.map((c) => (
+          <div className="control-row" key={c.en}>
+            <span className="action">
+              <span>{c.en}</span>
+              <span className="ar" dir="rtl" lang="ar">
+                {c.ar}
+              </span>
+            </span>
             <span className="keys">
               {c.keys.map((k) => (
                 <span className="key" key={k}>
@@ -56,10 +73,15 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
 
       {showSettings && (
         <>
-          <h2 style={{ marginTop: 28 }}>Systems // Settings</h2>
+          <h2 style={{ marginTop: 28 }}>
+            {COPY.controls.settingsHeadingEn}
+            <span className="ar" dir="rtl" lang="ar">
+              {COPY.controls.settingsHeadingAr}
+            </span>
+          </h2>
           <div className="panel-rows">
             <label className="setting-row">
-              <span>Sound effects</span>
+              <SettingLabel settingKey="sound" />
               <input
                 type="checkbox"
                 className="toggle"
@@ -68,7 +90,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
               />
             </label>
             <label className="setting-row">
-              <span>Ambience</span>
+              <SettingLabel settingKey="music" />
               <input
                 type="checkbox"
                 className="toggle"
@@ -77,7 +99,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
               />
             </label>
             <label className="setting-row">
-              <span>Master volume</span>
+              <SettingLabel settingKey="volume" />
               <input
                 type="range"
                 className="slider"
@@ -89,7 +111,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
               />
             </label>
             <div className="setting-row">
-              <span>Graphics</span>
+              <SettingLabel settingKey="quality" />
               <div className="seg" role="group" aria-label="Graphics quality">
                 {(['low', 'medium', 'high'] as Quality[]).map((q) => (
                   <button key={q} className={settings.quality === q ? 'active' : ''} onClick={() => updateSettings({ quality: q })}>
@@ -99,7 +121,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
               </div>
             </div>
             <label className="setting-row">
-              <span>Reduced motion</span>
+              <SettingLabel settingKey="reducedMotion" />
               <input
                 type="checkbox"
                 className="toggle"
@@ -108,7 +130,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
               />
             </label>
             <label className="setting-row">
-              <span>High contrast UI</span>
+              <SettingLabel settingKey="highContrast" />
               <input
                 type="checkbox"
                 className="toggle"
@@ -118,9 +140,9 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
             </label>
             {tutorialDone && (
               <div className="setting-row">
-                <span>Tutorial hints</span>
+                <SettingLabel settingKey="tutorial" />
                 <UIButton variant="ghost" onClick={resetTutorial}>
-                  Replay
+                  {COPY.controls.replayEn}
                 </UIButton>
               </div>
             )}
@@ -130,7 +152,7 @@ export function ControlsPanel({ onClose, showSettings = true }: ControlsPanelPro
 
       <div style={{ marginTop: 26, display: 'flex', justifyContent: 'center' }}>
         <UIButton ref={closeRef} onClick={onClose}>
-          Close
+          <Bilingual ar={COPY.controls.closeAr} en={COPY.controls.closeEn} />
         </UIButton>
       </div>
     </motion.div>

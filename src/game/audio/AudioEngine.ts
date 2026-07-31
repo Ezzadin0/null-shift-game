@@ -84,7 +84,9 @@ class AudioEngine {
     lfoGain.connect(filter.frequency)
     lfo.start()
 
-    const freqs = [55, 55.5, 82.4, 110.3]
+    // Root, a touch of detune, a fifth, and a neutral-ish upper partial —
+    // a warmer, more open stack than an even-tempered triad.
+    const freqs = [55, 55.4, 82.4, 97.9]
     const oscs = freqs.map((f, i) => {
       const o = ctx.createOscillator()
       o.type = i % 2 === 0 ? 'sawtooth' : 'triangle'
@@ -206,22 +208,41 @@ class AudioEngine {
   }
 
   gameStart() {
-    this.tone(220, { type: 'sawtooth', dur: 0.5, gain: 0.12, slideTo: 660, filterFreq: 1800 })
-    this.tone(440, { type: 'sine', dur: 0.4, gain: 0.1, delay: 0.15 })
-    this.tone(880, { type: 'sine', dur: 0.5, gain: 0.08, delay: 0.3 })
+    // Rising gate-opening sting: low swell, then two bright confirmations.
+    this.tone(110, { type: 'sawtooth', dur: 0.85, gain: 0.13, slideTo: 440, filterFreq: 1500 })
+    this.tone(330, { type: 'triangle', dur: 0.45, gain: 0.1, delay: 0.12 })
+    this.tone(494, { type: 'sine', dur: 0.5, gain: 0.09, delay: 0.32 })
+    this.tone(988, { type: 'sine', dur: 0.6, gain: 0.06, delay: 0.5 })
+    this.noiseBurst(0.5, 0.05, 1800, 0.05)
   }
 
+  /** City reads clean and sharp; Desert reads lower, warmer and sandier. */
   shift(to: Reality) {
-    const base = to === 'cyan' ? 900 : 620
-    this.tone(base, { type: 'square', dur: 0.12, gain: 0.09, slideTo: base * 2, filterFreq: 2600 })
-    this.tone(base / 2, { type: 'sawtooth', dur: 0.2, gain: 0.1, slideTo: base / 4, filterFreq: 1200 })
-    this.noiseBurst(0.14, 0.1, 2400, 0, 'highpass')
+    const city = to === 'cyan'
+    const base = city ? 960 : 560
+    this.tone(base, {
+      type: city ? 'square' : 'triangle',
+      dur: city ? 0.11 : 0.16,
+      gain: 0.09,
+      slideTo: base * 2,
+      filterFreq: city ? 3000 : 1500,
+    })
+    this.tone(base / 2, {
+      type: 'sawtooth',
+      dur: city ? 0.19 : 0.26,
+      gain: 0.1,
+      slideTo: base / 4,
+      filterFreq: city ? 1400 : 780,
+    })
+    // City gets a crisp airy tick, Desert a softer grain wash.
+    this.noiseBurst(city ? 0.12 : 0.22, city ? 0.1 : 0.075, city ? 3000 : 1100, 0, city ? 'highpass' : 'lowpass')
   }
 
   shard() {
-    const f = 1200 + Math.random() * 300
+    const f = 1180 + Math.random() * 280
     this.tone(f, { type: 'sine', dur: 0.09, gain: 0.1 })
-    this.tone(f * 1.5, { type: 'sine', dur: 0.13, gain: 0.07, delay: 0.03 })
+    this.tone(f * 1.5, { type: 'sine', dur: 0.14, gain: 0.07, delay: 0.03 })
+    this.tone(f * 2, { type: 'sine', dur: 0.1, gain: 0.03, delay: 0.06 })
   }
 
   nearMiss() {

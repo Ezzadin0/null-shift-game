@@ -1,17 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { COPY } from './copy'
 
-const STEPS = [
-  { at: 600, text: 'REALITY LINK ESTABLISHED' },
-  { at: 2200, text: 'SPACE TO SHIFT' },
-] as const
+const TIMINGS = [600, 2200] as const
 
 /** Text beats layered over the intro camera fly-in. */
 export function IntroOverlay() {
   const [step, setStep] = useState(-1)
 
   useEffect(() => {
-    const timers = STEPS.map((s, i) => window.setTimeout(() => setStep(i), s.at))
+    const timers = TIMINGS.map((at, i) => window.setTimeout(() => setStep(i), at))
     return () => timers.forEach((t) => window.clearTimeout(t))
   }, [])
 
@@ -21,23 +19,33 @@ export function IntroOverlay() {
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
         transition={{ duration: 1.1, ease: 'easeOut' }}
-        style={{ position: 'absolute', inset: 0, background: '#03040B', pointerEvents: 'none' }}
+        style={{ position: 'absolute', inset: 0, background: '#020706', pointerEvents: 'none' }}
       />
       <AnimatePresence mode="wait">
         {step >= 0 && (
           <motion.div
             key={step}
-            className="intro-text"
-            initial={{ opacity: 0, letterSpacing: '1em' }}
-            animate={{ opacity: 1, letterSpacing: '0.55em' }}
+            className="intro-beat"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {STEPS[step].text}
+            <div className="intro-text-ar" dir="rtl" lang="ar">
+              {COPY.intro.beats[step].ar}
+            </div>
+            <motion.div
+              className="intro-text"
+              initial={{ letterSpacing: '1em', opacity: 0 }}
+              animate={{ letterSpacing: '0.55em', opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {COPY.intro.beats[step].en}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="intro-skip">Space / Enter to skip</div>
+      <div className="intro-skip">{COPY.intro.skip}</div>
     </motion.div>
   )
 }

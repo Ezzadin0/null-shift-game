@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore } from '../stores/gameStore'
 import { UIButton } from './UIButton'
 import { ControlsPanel } from './ControlsPanel'
+import { Bilingual } from './Bilingual'
+import { COPY } from './copy'
 
 export function PauseMenu() {
   const resume = useGameStore((s) => s.resume)
@@ -18,22 +20,31 @@ export function PauseMenu() {
         ) : (
           <motion.div
             key="pause"
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            className="brand"
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
             transition={{ duration: 0.2 }}
           >
-            <h1 className="title" style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)' }}>
-              LINK<span className="slash">//</span>SUSPENDED
+            <h1 className="title-ar" style={{ fontSize: 'clamp(1.6rem, 4.5vw, 2.8rem)' }} dir="rtl" lang="ar">
+              {COPY.pause.titleAr}
             </h1>
+            <p className="title" style={{ fontSize: 'clamp(1rem, 3vw, 1.7rem)' }}>
+              {COPY.pause.titleEn}
+            </p>
             <div className="menu-stack">
               <UIButton variant="primary" onClick={resume} autoFocus>
-                Resume
+                <Bilingual ar={COPY.pause.resumeAr} en={COPY.pause.resumeEn} />
               </UIButton>
-              <UIButton onClick={restart}>Restart</UIButton>
-              <UIButton onClick={() => setShowControls(true)}>Controls & Settings</UIButton>
-              <UIButton onClick={toMenu}>Abandon Run</UIButton>
+              <UIButton onClick={restart}>
+                <Bilingual ar={COPY.pause.restartAr} en={COPY.pause.restartEn} />
+              </UIButton>
+              <UIButton onClick={() => setShowControls(true)}>
+                <Bilingual ar={COPY.menu.controlsAr} en={COPY.menu.controlsEn} />
+              </UIButton>
+              <UIButton onClick={toMenu}>
+                <Bilingual ar={COPY.pause.quitAr} en={COPY.pause.quitEn} />
+              </UIButton>
             </div>
           </motion.div>
         )}

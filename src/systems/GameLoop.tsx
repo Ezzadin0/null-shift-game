@@ -6,9 +6,10 @@ import { BOUNDS, COMBO, NEAR_MISS, OVERDRIVE, PLAYER, SCORE, SHIFT, SPEED, WORLD
 import { clamp, damp, pick } from '../utils/math'
 import { spawnNextPattern } from './patterns'
 import type { ObstacleInstance } from '../types'
+import { COPY } from '../ui/copy'
 
-const NEAR_MISS_TEXTS = ['NEAR MISS', 'FRACTURE DODGE', 'CLOSE CALL'] as const
-const PHASE_TEXTS = ['PERFECT PHASE', 'REALITY SLIP'] as const
+const NEAR_MISS_TEXTS = COPY.popups.nearMiss
+const PHASE_TEXTS = COPY.popups.phase
 
 /** Position of an obstacle including its oscillation offset. */
 function obstaclePos(o: ObstacleInstance, t: number) {
@@ -151,7 +152,7 @@ export function GameLoop() {
     // ---- spawning ----
     if (r.distance >= r.nextPatternDist) {
       const wasCollapse = spawnNextPattern()
-      if (wasCollapse) store.addPopup('REALITY COLLAPSE', 'warning')
+      if (wasCollapse) store.addPopup(COPY.popups.collapse.en, 'warning', COPY.popups.collapse.ar)
     }
 
     // ---- obstacles ----
@@ -197,11 +198,13 @@ export function GameLoop() {
             addShockwave(0.45)
             audio.nearMiss()
             awardCombo('near')
-            store.addPopup(pick(NEAR_MISS_TEXTS), 'near')
+            const nm = pick(NEAR_MISS_TEXTS)
+            store.addPopup(nm.en, 'near', nm.ar)
           } else if (!dangerous && r.time - r.lastShiftAt < SHIFT.chainWindow && o.closest < 1.0) {
             audio.nearMiss()
             awardCombo('phase')
-            store.addPopup(pick(PHASE_TEXTS), 'phase')
+            const ph = pick(PHASE_TEXTS)
+            store.addPopup(ph.en, 'phase', ph.ar)
           }
         }
       }
@@ -230,7 +233,7 @@ export function GameLoop() {
             audio.overdriveReady()
             if (!r.sawOverdriveHint) {
               r.sawOverdriveHint = true
-              store.addPopup('OVERDRIVE READY — PRESS SHIFT', 'system')
+              store.addPopup(COPY.hud.overdriveReadyEn, 'system', COPY.hud.overdriveReadyAr)
             }
           }
           r.shards.splice(i, 1)

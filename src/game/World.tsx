@@ -5,8 +5,9 @@ import { runtime } from './runtime'
 import { COLORS } from '../utils/constants'
 import { randRange } from '../utils/math'
 
-const CYAN = new THREE.Color(COLORS.cyan.primary)
-const MAGENTA = new THREE.Color(COLORS.magenta.primary)
+const CITY = new THREE.Color(COLORS.cyan.primary)
+const DESERT = new THREE.Color(COLORS.magenta.primary)
+const DESERT_WARM = new THREE.Color(COLORS.magenta.secondary)
 const BG = new THREE.Color(COLORS.bgDeep)
 
 const tmpObj = new THREE.Object3D()
@@ -38,7 +39,7 @@ export function Atmosphere() {
   }, [scene])
 
   useFrame((_, dt) => {
-    const target = runtime.reality === 'cyan' ? CYAN : MAGENTA
+    const target = runtime.reality === 'cyan' ? CITY : DESERT
     const k = 1 - Math.exp(-3.5 * dt)
     if (scene.fog instanceof THREE.FogExp2) {
       tmpColor.copy(BG).lerp(target, 0.1)
@@ -47,17 +48,17 @@ export function Atmosphere() {
     }
     if (key.current) key.current.color.lerp(target, k)
     if (fill.current) {
-      tmpColor.copy(runtime.reality === 'cyan' ? MAGENTA : CYAN)
+      tmpColor.copy(runtime.reality === 'cyan' ? DESERT : CITY)
       fill.current.color.lerp(tmpColor, k)
     }
   })
 
   return (
     <>
-      <ambientLight intensity={0.35} color="#4a5578" />
+      <ambientLight intensity={0.36} color="#3d5a4e" />
       <pointLight ref={key} position={[0, 12, -30]} intensity={280} distance={120} color={COLORS.cyan.primary} />
       <pointLight ref={fill} position={[0, 4, 14]} intensity={60} distance={60} color={COLORS.magenta.primary} />
-      <hemisphereLight args={['#1a2245', '#03040B', 0.5]} />
+      <hemisphereLight args={['#123028', '#020706', 0.5]} />
     </>
   )
 }
@@ -78,7 +79,7 @@ export function GridFloor() {
   useFrame((_, dt) => {
     if (!mat.current) return
     mat.current.uniforms.uScroll.value = runtime.distance % 8
-    const target = runtime.reality === 'cyan' ? CYAN : MAGENTA
+    const target = runtime.reality === 'cyan' ? CITY : DESERT
     ;(mat.current.uniforms.uColor.value as THREE.Color).lerp(target, 1 - Math.exp(-3.5 * dt))
   })
 
@@ -217,7 +218,7 @@ export function Towers() {
     <>
       <instancedMesh ref={mesh} args={[undefined, undefined, TOWER_COUNT]} frustumCulled={false}>
         <boxGeometry />
-        <meshStandardMaterial color="#0a0e20" metalness={0.6} roughness={0.5} emissive="#11132A" emissiveIntensity={0.35} />
+        <meshStandardMaterial color="#061713" metalness={0.6} roughness={0.5} emissive="#0C2A22" emissiveIntensity={0.4} />
       </instancedMesh>
       <instancedMesh ref={strips} args={[undefined, undefined, TOWER_COUNT]} frustumCulled={false}>
         <boxGeometry />
@@ -286,7 +287,7 @@ export function ArchFrames() {
 
   return (
     <instancedMesh ref={mesh} args={[frameGeometry, undefined, FRAME_COUNT]} frustumCulled={false}>
-      <meshStandardMaterial color="#0c1128" emissive="#2a3466" emissiveIntensity={0.8} metalness={0.7} roughness={0.35} />
+      <meshStandardMaterial color="#0a1f18" emissive="#8a6b2e" emissiveIntensity={0.85} metalness={0.75} roughness={0.32} />
     </instancedMesh>
   )
 }
@@ -315,7 +316,7 @@ export function Debris() {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, DEBRIS_COUNT]} frustumCulled={false}>
       <tetrahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color="#131936" emissive="#31407a" emissiveIntensity={0.6} metalness={0.8} roughness={0.3} />
+      <meshStandardMaterial color="#12251d" emissive="#6d5a30" emissiveIntensity={0.6} metalness={0.8} roughness={0.3} />
     </instancedMesh>
   )
 }
@@ -386,7 +387,7 @@ export function EnergyBeams() {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, BEAM_COUNT]} frustumCulled={false}>
       <boxGeometry />
-      <meshBasicMaterial color="#5f7cff" toneMapped={false} transparent opacity={0.6} />
+      <meshBasicMaterial color="#D8A84E" toneMapped={false} transparent opacity={0.5} />
     </instancedMesh>
   )
 }
@@ -418,7 +419,7 @@ export function Glyphs() {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, GLYPH_COUNT]} frustumCulled={false}>
       <ringGeometry args={[0.55, 0.8, 6]} />
-      <meshBasicMaterial color="#38BDF8" toneMapped={false} transparent opacity={0.35} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#00E59A" toneMapped={false} transparent opacity={0.32} side={THREE.DoubleSide} />
     </instancedMesh>
   )
 }
@@ -437,7 +438,7 @@ export function DataField() {
       positions[i * 3] = randRange(-60, 60)
       positions[i * 3 + 1] = randRange(-4, 40)
       positions[i * 3 + 2] = randRange(-280, 20)
-      const c = Math.random() < 0.5 ? CYAN : Math.random() < 0.5 ? MAGENTA : new THREE.Color('#8b9dff')
+      const c = Math.random() < 0.5 ? CITY : Math.random() < 0.5 ? DESERT : DESERT_WARM
       colors[i * 3] = c.r
       colors[i * 3 + 1] = c.g
       colors[i * 3 + 2] = c.b
@@ -521,7 +522,7 @@ export function SpeedLines() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <lineBasicMaterial color="#9fd8ff" transparent opacity={0.1} depthWrite={false} />
+      <lineBasicMaterial color="#CFE8DA" transparent opacity={0.1} depthWrite={false} />
     </lineSegments>
   )
 }
@@ -546,8 +547,305 @@ export function Skyline() {
       {boxes.map((b, i) => (
         <mesh key={i} position={[b.x, b.h / 2 - 4, b.z]}>
           <boxGeometry args={[b.w, b.h, b.w]} />
-          <meshBasicMaterial color="#05071a" />
+          <meshBasicMaterial color="#030D0A" />
         </mesh>
+      ))}
+    </group>
+  )
+}
+
+const MESA_SPAN = 340
+const MESA_COUNT = 22
+
+/**
+ * Desert Reality layer: abstract sandstone mesas and monumental arches set
+ * beyond the towers. They fade up as the player shifts to Desert, so both
+ * layers stay resident and nothing is allocated mid-run.
+ */
+export function DesertFormations() {
+  const mesas = useRef<THREE.InstancedMesh>(null)
+  const arches = useRef<THREE.InstancedMesh>(null)
+
+  const mesaSpecs = useMemo(
+    () =>
+      makeSpecs(MESA_COUNT, () => {
+        const side = Math.random() < 0.5 ? -1 : 1
+        const sy = randRange(5, 17)
+        return {
+          x: side * randRange(24, 62),
+          y: sy / 2 - 3,
+          z: randRange(-MESA_SPAN + 20, 20),
+          sx: randRange(9, 22),
+          sy,
+          sz: randRange(9, 20),
+          rotSpeed: 0,
+        }
+      }),
+    [],
+  )
+
+  const archSpecs = useMemo(
+    () =>
+      makeSpecs(6, () => ({
+        x: randRange(-8, 8),
+        y: 5,
+        z: randRange(-MESA_SPAN + 20, 20),
+        sx: randRange(11, 17),
+        sy: randRange(9, 13),
+        sz: 0.9,
+        rotSpeed: 0,
+      })),
+    [],
+  )
+
+  useScrollingInstances(mesas, mesaSpecs, MESA_SPAN)
+  useScrollingInstances(arches, archSpecs, MESA_SPAN)
+
+  // A pointed horseshoe arch profile — a desert gateway silhouette.
+  const archGeometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    shape.moveTo(-0.5, -0.5)
+    shape.lineTo(-0.5, 0.12)
+    shape.quadraticCurveTo(-0.5, 0.5, 0, 0.55)
+    shape.quadraticCurveTo(0.5, 0.5, 0.5, 0.12)
+    shape.lineTo(0.5, -0.5)
+    shape.lineTo(0.36, -0.5)
+    shape.lineTo(0.36, 0.12)
+    shape.quadraticCurveTo(0.36, 0.37, 0, 0.41)
+    shape.quadraticCurveTo(-0.36, 0.37, -0.36, 0.12)
+    shape.lineTo(-0.36, -0.5)
+    shape.closePath()
+    return new THREE.ExtrudeGeometry(shape, { depth: 0.08, bevelEnabled: false })
+  }, [])
+
+  useFrame((_, dt) => {
+    // desert presence: 1 in Desert Reality, near 0 in City
+    const want = runtime.reality === 'magenta' ? 1 : 0.12
+    const k = 1 - Math.exp(-2.6 * dt)
+    for (const ref of [mesas, arches]) {
+      const m = ref.current
+      if (!m) continue
+      const mat = m.material as THREE.MeshStandardMaterial
+      mat.opacity += (want - mat.opacity) * k
+    }
+  })
+
+  return (
+    <>
+      <instancedMesh ref={mesas} args={[undefined, undefined, MESA_COUNT]} frustumCulled={false}>
+        <boxGeometry />
+        <meshStandardMaterial
+          color="#1a1207"
+          emissive="#7a5c22"
+          emissiveIntensity={0.42}
+          metalness={0.25}
+          roughness={0.85}
+          transparent
+          opacity={0.12}
+          depthWrite={false}
+        />
+      </instancedMesh>
+      <instancedMesh ref={arches} args={[archGeometry, undefined, 6]} frustumCulled={false}>
+        <meshStandardMaterial
+          color="#231806"
+          emissive={COLORS.magenta.primary}
+          emissiveIntensity={0.9}
+          metalness={0.6}
+          roughness={0.4}
+          transparent
+          opacity={0.12}
+          depthWrite={false}
+        />
+      </instancedMesh>
+    </>
+  )
+}
+
+const MOTE_COUNT = 260
+
+/** Suspended golden sand motes, strongest in Desert Reality. */
+export function SandMotes() {
+  const points = useRef<THREE.Points>(null)
+  const delta = useWorldDelta()
+
+  const positions = useMemo(() => {
+    const arr = new Float32Array(MOTE_COUNT * 3)
+    for (let i = 0; i < MOTE_COUNT; i++) {
+      arr[i * 3] = randRange(-30, 30)
+      arr[i * 3 + 1] = randRange(-1, 16)
+      arr[i * 3 + 2] = randRange(-180, 20)
+    }
+    return arr
+  }, [])
+
+  useFrame((state, dt) => {
+    const p = points.current
+    if (!p) return
+    const d = delta() * 0.85
+    const t = state.clock.elapsedTime
+    const pos = p.geometry.attributes.position as THREE.BufferAttribute
+    for (let i = 0; i < MOTE_COUNT; i++) {
+      let z = pos.getZ(i) + d
+      if (z > 20) z -= 200
+      pos.setZ(i, z)
+      // gentle updraft drift
+      pos.setY(i, pos.getY(i) + Math.sin(t * 0.6 + i) * 0.004)
+    }
+    pos.needsUpdate = true
+    const mat = p.material as THREE.PointsMaterial
+    const want = runtime.reality === 'magenta' ? 0.72 : 0.1
+    mat.opacity += (want - mat.opacity) * (1 - Math.exp(-2.6 * dt))
+  })
+
+  return (
+    <points ref={points} frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.1}
+        color={COLORS.magenta.secondary}
+        transparent
+        opacity={0.1}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </points>
+  )
+}
+
+const PALM_COUNT = 14
+const PALM_SPAN = 300
+
+/**
+ * City Reality layer: sparse digital palm silhouettes. Deliberately reduced to
+ * a stylised crown of radiating fronds rather than a modelled tree.
+ */
+export function PalmSilhouettes() {
+  const group = useRef<THREE.Group>(null)
+  const delta = useWorldDelta()
+
+  const specs = useMemo(
+    () =>
+      Array.from({ length: PALM_COUNT }, () => {
+        const side = Math.random() < 0.5 ? -1 : 1
+        return {
+          x: side * randRange(11, 19),
+          y: randRange(-1, 0.5),
+          z: randRange(-PALM_SPAN + 20, 20),
+          scale: randRange(1.6, 3.1),
+          rot: randRange(0, Math.PI),
+        }
+      }),
+    [],
+  )
+
+  useFrame((_, dt) => {
+    const g = group.current
+    if (!g) return
+    const d = delta()
+    for (let i = 0; i < g.children.length; i++) {
+      const child = g.children[i]
+      const spec = specs[i]
+      spec.z += d
+      if (spec.z > 20) spec.z -= PALM_SPAN
+      child.position.set(spec.x, spec.y, spec.z)
+    }
+    const want = runtime.reality === 'cyan' ? 0.5 : 0.08
+    const k = 1 - Math.exp(-2.6 * dt)
+    for (const child of g.children) {
+      child.traverse((o) => {
+        const mesh = o as THREE.Mesh
+        if (mesh.material) {
+          const mat = mesh.material as THREE.MeshBasicMaterial
+          mat.opacity += (want - mat.opacity) * k
+        }
+      })
+    }
+  })
+
+  return (
+    <group ref={group}>
+      {specs.map((spec, i) => (
+        <group key={i} position={[spec.x, spec.y, spec.z]} scale={spec.scale} rotation={[0, spec.rot, 0]}>
+          {/* trunk */}
+          <mesh position={[0, 1.1, 0]}>
+            <boxGeometry args={[0.08, 2.2, 0.08]} />
+            <meshBasicMaterial color={COLORS.cyan.secondary} transparent opacity={0.08} depthWrite={false} />
+          </mesh>
+          {/* radiating fronds */}
+          {Array.from({ length: 7 }, (_, f) => {
+            const a = (f / 7) * Math.PI * 2
+            return (
+              <mesh key={f} position={[Math.cos(a) * 0.42, 2.3, Math.sin(a) * 0.42]} rotation={[0.5, -a, 0.35]}>
+                <boxGeometry args={[0.9, 0.03, 0.1]} />
+                <meshBasicMaterial color={COLORS.cyan.primary} transparent opacity={0.08} depthWrite={false} />
+              </mesh>
+            )
+          })}
+        </group>
+      ))}
+    </group>
+  )
+}
+
+const MOTIF_COUNT = 9
+const MOTIF_SPAN = 300
+
+/**
+ * Eight-point star motifs — the classic Islamic geometric figure, built from
+ * two overlaid squares — mounted as holographic panels along the route.
+ */
+export function StarMotifs() {
+  const group = useRef<THREE.Group>(null)
+  const delta = useWorldDelta()
+
+  const specs = useMemo(
+    () =>
+      Array.from({ length: MOTIF_COUNT }, () => {
+        const side = Math.random() < 0.5 ? -1 : 1
+        return {
+          x: side * randRange(8.5, 14),
+          y: randRange(3, 9),
+          z: randRange(-MOTIF_SPAN + 20, 20),
+          scale: randRange(0.8, 1.7),
+          spin: randRange(-0.25, 0.25),
+        }
+      }),
+    [],
+  )
+
+  useFrame((_, dt) => {
+    const g = group.current
+    if (!g) return
+    const d = delta()
+    for (let i = 0; i < g.children.length; i++) {
+      const spec = specs[i]
+      spec.z += d
+      if (spec.z > 20) spec.z -= MOTIF_SPAN
+      const child = g.children[i]
+      child.position.z = spec.z
+      child.rotation.z += spec.spin * dt
+    }
+  })
+
+  return (
+    <group ref={group}>
+      {specs.map((spec, i) => (
+        <group key={i} position={[spec.x, spec.y, spec.z]} scale={spec.scale}>
+          <mesh>
+            <ringGeometry args={[0.62, 0.72, 4]} />
+            <meshBasicMaterial color={COLORS.magenta.primary} transparent opacity={0.34} side={THREE.DoubleSide} toneMapped={false} depthWrite={false} />
+          </mesh>
+          <mesh rotation={[0, 0, Math.PI / 4]}>
+            <ringGeometry args={[0.62, 0.72, 4]} />
+            <meshBasicMaterial color={COLORS.cyan.primary} transparent opacity={0.34} side={THREE.DoubleSide} toneMapped={false} depthWrite={false} />
+          </mesh>
+          <mesh>
+            <ringGeometry args={[0.26, 0.31, 8]} />
+            <meshBasicMaterial color={COLORS.magenta.secondary} transparent opacity={0.3} side={THREE.DoubleSide} toneMapped={false} depthWrite={false} />
+          </mesh>
+        </group>
       ))}
     </group>
   )
@@ -560,6 +858,10 @@ export function World() {
       <GridFloor />
       <Towers />
       <ArchFrames />
+      <StarMotifs />
+      <PalmSilhouettes />
+      <DesertFormations />
+      <SandMotes />
       <Debris />
       <LightStrips />
       <EnergyBeams />
