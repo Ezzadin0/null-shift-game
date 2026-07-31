@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore } from '../stores/gameStore'
 import { runtime } from '../game/runtime'
 import { audio } from '../game/audio/AudioEngine'
-import { OVERDRIVE } from '../utils/constants'
+import { OVERDRIVE, realityLabel } from '../utils/constants'
 import { IconBolt, IconFullscreen, IconPause, IconShift } from './icons'
+import { COPY } from './copy'
 
 /** White flash overlay driven directly from the runtime each frame. */
 function FlashOverlay() {
@@ -21,26 +22,22 @@ function FlashOverlay() {
   return <div ref={ref} className="fx-flash" />
 }
 
-const HINTS: Array<{ at: number; text: string }> = [
-  { at: 1.2, text: 'Move to steer' },
-  { at: 5.5, text: 'Space to shift reality' },
-  { at: 11, text: 'Collect shards' },
-  { at: 24, text: 'Shift activates overdrive when charged' },
-]
+const HINT_TIMES = [1.2, 5.5, 11, 24] as const
 
 function TutorialHints() {
-  const [hint, setHint] = useState<string | null>(null)
+  const [hint, setHint] = useState<{ ar: string; en: string } | null>(null)
   const shown = useRef(new Set<number>())
 
   useEffect(() => {
     const iv = window.setInterval(() => {
-      for (let i = HINTS.length - 1; i >= 0; i--) {
-        const h = HINTS[i]
-        if (runtime.time >= h.at && runtime.time < h.at + 3.2) {
+      for (let i = HINT_TIMES.length - 1; i >= 0; i--) {
+        const at = HINT_TIMES[i]
+        if (runtime.time >= at && runtime.time < at + 3.2) {
           if (!shown.current.has(i)) {
             shown.current.add(i)
-            setHint(h.text)
-            window.setTimeout(() => setHint((cur) => (cur === h.text ? null : cur)), 3000)
+            const next = COPY.hints[i]
+            setHint(next)
+            window.setTimeout(() => setHint((cur) => (cur === next ? null : cur)), 3000)
           }
           return
         }
@@ -53,13 +50,16 @@ function TutorialHints() {
     <AnimatePresence>
       {hint && (
         <motion.div
-          key={hint}
+          key={hint.en}
           className="hint"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
         >
-          {hint}
+          <span className="ar" dir="rtl" lang="ar" style={{ display: 'block', marginBottom: 4 }}>
+            {hint.ar}
+          </span>
+          {hint.en}
         </motion.div>
       )}
     </AnimatePresence>
@@ -86,12 +86,19 @@ export function HUD() {
 
   const energyPct = energy / OVERDRIVE.energyMax
   const energyFull = energyPct >= 1
+  const label = realityLabel(reality)
 
   const toggleFullscreen = () => {
     audio.uiClick()
     if (document.fullscreenElement) void document.exitFullscreen()
     else void document.documentElement.requestFullscreen().catch(() => undefined)
   }
+
+  const energyCaption = overdrive
+    ? { ar: COPY.hud.overdriveActiveAr, en: COPY.hud.overdriveActiveEn }
+    : energyFull
+      ? { ar: COPY.hud.overdriveReadyAr, en: COPY.hud.overdriveReadyEn }
+      : { ar: COPY.hud.energyAr, en: COPY.hud.energyEn }
 
   return (
     <div className="hud">
@@ -101,14 +108,27 @@ export function HUD() {
 
       <div className="hud-top">
         <div>
-          <div className="hud-label">Score</div>
+          <div className="hud-label">
+            <span className="ar" dir="rtl" lang="ar">
+              {COPY.hud.scoreAr}
+            </span>
+            <span className="en" style={{ marginInlineStart: 8 }}>
+              {COPY.hud.scoreEn}
+            </span>
+          </div>
           <div className="hud-score">{score.toLocaleString()}</div>
           <div className="hud-stats" style={{ marginTop: 6 }}>
             <span>
-              DIST <b>{distance}m</b>
+              <span className="ar" dir="rtl" lang="ar">
+                {COPY.hud.distanceAr}
+              </span>{' '}
+              <b>{distance}m</b>
             </span>
             <span>
-              VEL <b>LV{speedLevel}</b>
+              <span className="ar" dir="rtl" lang="ar">
+                {COPY.hud.speedAr}
+              </span>{' '}
+              <b>LV{speedLevel}</b>
             </span>
           </div>
         </div>
@@ -140,7 +160,14 @@ export function HUD() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.7 }}
           >
-            <div className="hud-label">Combo ×{combo}</div>
+            <div className="hud-label">
+              <span className="ar" dir="rtl" lang="ar">
+                {COPY.hud.comboAr}
+              </span>
+              <span className="en" style={{ marginInlineStart: 6 }}>
+                ×{combo}
+              </span>
+            </div>
             <motion.div className="combo-mult" key={multiplier} initial={{ scale: 1.5 }} animate={{ scale: 1 }}>
               ×{multiplier}
             </motion.div>
@@ -159,6 +186,11 @@ export function HUD() {
               exit={{ opacity: 0, y: -22, scale: 1.06 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
+              {p.ar && (
+                <span className="ar" dir="rtl" lang="ar">
+                  {p.ar}
+                </span>
+              )}
               {p.text}
             </motion.div>
           ))}
@@ -171,7 +203,10 @@ export function HUD() {
         <div>
           <div className="reality-chip">
             <span className="reality-dot" />
-            {reality === 'cyan' ? 'Cyan Reality' : 'Magenta Reality'}
+            <span className="ar" dir="rtl" lang="ar">
+              {label.ar}
+            </span>
+            <span className="en">{label.en}</span>
           </div>
           <div className="shift-cd" style={{ marginTop: 8 }}>
             <i style={{ width: `${Math.round((1 - shiftCooldownPct) * 100)}%` }} />
@@ -179,8 +214,11 @@ export function HUD() {
         </div>
 
         <div className="energy-wrap">
-          <div className="hud-label" style={{ textAlign: 'center' }}>
-            {overdrive ? 'OVERDRIVE ACTIVE' : energyFull ? 'OVERDRIVE READY — SHIFT' : 'Quantum Energy'}
+          <div className="hud-label" style={{ textAlign: 'center', justifyContent: 'center', display: 'flex', gap: 8 }}>
+            <span className="ar" dir="rtl" lang="ar">
+              {energyCaption.ar}
+            </span>
+            <span className="en">{energyCaption.en}</span>
           </div>
           <div className={`energy-bar ${energyFull || overdrive ? 'full' : ''}`}>
             <i style={{ transform: `scaleX(${overdrive ? 1 : energyPct})` }} />

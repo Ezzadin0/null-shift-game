@@ -59,6 +59,8 @@ export interface RunStats {
 export interface Popup {
   id: number
   text: string
+  /** Optional Arabic line rendered above the Latin callout. */
+  ar?: string
   variant: 'near' | 'phase' | 'combo' | 'system' | 'warning'
 }
 

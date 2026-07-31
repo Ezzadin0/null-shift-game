@@ -1,16 +1,29 @@
 import type { Reality } from '../types'
 
+/**
+ * The two reality keys stay `cyan` / `magenta` throughout the codebase because
+ * collision, spawning and pooling all branch on them. Only their presentation
+ * changed: `cyan` is now City Reality (emerald) and `magenta` is Desert
+ * Reality (sand gold).
+ */
 export const COLORS = {
-  cyan: { primary: '#00E5FF', secondary: '#38BDF8' },
-  magenta: { primary: '#FF2E93', secondary: '#A855F7' },
-  bgDeep: '#03040B',
-  bgMid: '#070B1B',
-  bgHigh: '#11132A',
-  highlight: '#F8FAFC',
+  cyan: { primary: '#00E59A', secondary: '#006C4C' },
+  magenta: { primary: '#D8A84E', secondary: '#FFD98A' },
+  bgDeep: '#020706',
+  bgMid: '#061410',
+  bgHigh: '#0C1F19',
+  highlight: '#F7F5EC',
+} as const
+
+/** Visible bilingual labels for each reality. */
+export const REALITY_LABELS = {
+  cyan: { en: 'CITY REALITY', ar: 'واقع المدينة' },
+  magenta: { en: 'DESERT REALITY', ar: 'واقع الصحراء' },
 } as const
 
 export const realityColor = (r: Reality) => COLORS[r].primary
 export const realitySecondary = (r: Reality) => COLORS[r].secondary
+export const realityLabel = (r: Reality) => REALITY_LABELS[r]
 
 /** Playfield half extents the glider can occupy. */
 export const BOUNDS = { x: 6.2, yMin: 0.7, yMax: 6.4 } as const

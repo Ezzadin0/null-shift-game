@@ -3,6 +3,7 @@ import type { Phase, Popup, Reality, RunStats, Settings } from '../types'
 import { OVERDRIVE, SHIFT, STORAGE_KEYS } from '../utils/constants'
 import { addShockwave, resetRuntime, runtime } from '../game/runtime'
 import { audio } from '../game/audio/AudioEngine'
+import { COPY } from '../ui/copy'
 
 interface HudSnapshot {
   score: number
@@ -38,7 +39,7 @@ interface GameState extends HudSnapshot {
   shiftReality: () => void
   activateOverdrive: () => void
   syncHud: (snap: HudSnapshot) => void
-  addPopup: (text: string, variant: Popup['variant']) => void
+  addPopup: (text: string, variant: Popup['variant'], ar?: string) => void
   removePopup: (id: number) => void
   updateSettings: (patch: Partial<Settings>) => void
   markTutorialDone: () => void
@@ -199,14 +200,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     addShockwave(1.6)
     audio.overdrive()
     set({ overdrive: true })
-    get().addPopup('OVERDRIVE', 'combo')
+    get().addPopup(COPY.popups.overdrive.en, 'combo', COPY.popups.overdrive.ar)
   },
 
   syncHud: (snap) => set(snap),
 
-  addPopup: (text, variant) => {
+  addPopup: (text, variant, ar) => {
     const id = popupId++
-    set((s) => ({ popups: [...s.popups.slice(-3), { id, text, variant }] }))
+    set((s) => ({ popups: [...s.popups.slice(-3), { id, text, ar, variant }] }))
     window.setTimeout(() => get().removePopup(id), 1600)
   },
 

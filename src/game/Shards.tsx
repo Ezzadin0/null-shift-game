@@ -49,7 +49,7 @@ export function ShardField() {
       </instancedMesh>
       <instancedMesh ref={halo} args={[undefined, undefined, SHARD_SLOTS]} frustumCulled={false}>
         <octahedronGeometry args={[1, 0]} />
-        <meshBasicMaterial color="#ffd166" transparent opacity={0.3} toneMapped={false} depthWrite={false} />
+        <meshBasicMaterial color="#FFD98A" transparent opacity={0.32} toneMapped={false} depthWrite={false} />
       </instancedMesh>
     </group>
   )

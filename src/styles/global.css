@@ -1,22 +1,74 @@
 :root {
-  --cyan: #00e5ff;
-  --cyan-2: #38bdf8;
-  --magenta: #ff2e93;
-  --magenta-2: #a855f7;
-  --bg-deep: #03040b;
-  --bg-mid: #070b1b;
-  --bg-high: #11132a;
-  --text: #f8fafc;
-  --text-dim: #8b94b0;
-  --accent: var(--cyan);
-  --accent-2: var(--cyan-2);
+  /* City Reality (internal key: cyan) */
+  --city: #00e59a;
+  --city-deep: #006c4c;
+  /* Desert Reality (internal key: magenta) */
+  --desert: #d8a84e;
+  --desert-warm: #ffd98a;
+
+  --bg-deep: #020706;
+  --bg-mid: #061410;
+  --bg-high: #0c1f19;
+  --text: #f7f5ec;
+  --text-dim: #8fa79c;
+
+  --accent: var(--city);
+  --accent-2: var(--city-deep);
+
   --font-display: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'Cascadia Code', 'SF Mono', 'Consolas', 'Roboto Mono', monospace;
+  --font-ar: 'Noto Kufi Arabic', 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  --font-ar-body: 'Cairo', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, sans-serif;
 }
 
 [data-reality='magenta'] {
-  --accent: var(--magenta);
-  --accent-2: var(--magenta-2);
+  --accent: var(--desert);
+  --accent-2: var(--desert-warm);
+  --text-dim: #b3a288;
+}
+
+/* ---------- Arabic typography ----------
+   Arabic is cursive: tracking must stay at normal or glyphs stop reading as
+   connected words, so these never inherit the Latin letter-spacing. */
+
+.ar {
+  font-family: var(--font-ar);
+  letter-spacing: normal;
+  text-indent: 0;
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.ar-body {
+  font-family: var(--font-ar-body);
+  letter-spacing: normal;
+  text-indent: 0;
+  direction: rtl;
+  unicode-bidi: isolate;
+  text-transform: none;
+}
+
+/* stacked bilingual label: Arabic above, Latin below */
+.bi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.25;
+}
+
+.bi .ar {
+  font-size: 0.86em;
+  opacity: 0.92;
+}
+
+/* inline bilingual pair used in the HUD */
+.bi-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
 }
 
 * {
@@ -75,45 +127,103 @@ body {
 }
 
 .overlay.dim {
-  background: radial-gradient(ellipse at center, rgba(3, 4, 11, 0.35) 0%, rgba(3, 4, 11, 0.82) 100%);
+  background: radial-gradient(ellipse at center, rgba(2, 7, 6, 0.32) 0%, rgba(2, 7, 6, 0.86) 100%);
 }
 
 /* ---------- typography ---------- */
 
-.title {
-  font-size: clamp(3rem, 9vw, 6.5rem);
-  font-weight: 800;
-  letter-spacing: 0.14em;
+/* Arabic wordmark — the primary brand line */
+.title-ar {
+  font-family: var(--font-ar);
+  direction: rtl;
+  unicode-bidi: isolate;
+  font-size: clamp(2.1rem, 6.2vw, 4.4rem);
+  font-weight: 700;
+  letter-spacing: normal;
   margin: 0;
-  line-height: 1;
+  line-height: 1.32;
+  padding-bottom: 0.12em;
   color: var(--text);
   text-shadow:
-    0 0 24px rgba(0, 229, 255, 0.55),
-    0 0 80px rgba(0, 229, 255, 0.25);
+    0 0 26px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 84px color-mix(in srgb, var(--accent) 26%, transparent);
   position: relative;
 }
 
-.title .slash {
+/* Latin wordmark — sits under the Arabic */
+.title {
+  font-size: clamp(1.7rem, 5.2vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  margin: 6px 0 0;
+  line-height: 1.1;
+  color: var(--text);
+  text-shadow:
+    0 0 20px rgba(0, 229, 154, 0.42),
+    0 0 68px rgba(0, 229, 154, 0.18);
+  position: relative;
+}
+
+.title .amp {
   color: var(--accent);
   text-shadow: 0 0 30px var(--accent);
 }
 
+/* thin gold rule separating wordmark from subtitle */
+.title-rule {
+  width: min(340px, 62vw);
+  height: 1px;
+  margin: 20px 0 0;
+  background: linear-gradient(90deg, transparent, var(--desert), transparent);
+  opacity: 0.75;
+}
+
 .subtitle {
-  font-size: clamp(0.8rem, 2vw, 1.05rem);
-  letter-spacing: 0.85em;
-  text-indent: 0.85em;
-  color: var(--text-dim);
-  margin: 14px 0 0;
+  font-size: clamp(0.72rem, 1.8vw, 0.95rem);
+  letter-spacing: 0.62em;
+  text-indent: 0.62em;
+  color: var(--accent);
+  margin: 16px 0 0;
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: 600;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.subtitle-ar {
+  font-family: var(--font-ar);
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: normal;
+  font-size: clamp(0.8rem, 2vw, 1.05rem);
+  color: var(--desert-warm);
+  margin: 7px 0 0;
+  font-weight: 500;
+  line-height: 1.5;
+  text-shadow: 0 0 16px rgba(216, 168, 78, 0.4);
 }
 
 .tagline {
-  font-size: 0.72rem;
-  letter-spacing: 0.3em;
+  font-size: 0.7rem;
+  letter-spacing: 0.26em;
+  color: var(--text-dim);
+  margin-top: 24px;
+  text-transform: uppercase;
+  line-height: 1.9;
+  text-align: center;
+}
+
+.tagline-ar {
+  font-family: var(--font-ar-body);
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: normal;
+  text-transform: none;
+  font-size: 0.82rem;
   color: var(--text-dim);
   margin-top: 26px;
-  text-transform: uppercase;
+  line-height: 1.95;
+  text-align: center;
 }
 
 .glitch {
@@ -129,12 +239,12 @@ body {
 }
 
 .glitch::before {
-  color: var(--cyan);
+  color: var(--city);
   animation: glitch-a 7s infinite;
 }
 
 .glitch::after {
-  color: var(--magenta);
+  color: var(--desert);
   animation: glitch-b 7s infinite;
 }
 
@@ -171,8 +281,8 @@ body {
   gap: 10px;
   min-width: 240px;
   padding: 14px 34px;
-  background: linear-gradient(180deg, rgba(17, 19, 42, 0.72), rgba(7, 11, 27, 0.85));
-  border: 1px solid rgba(0, 229, 255, 0.35);
+  background: linear-gradient(180deg, rgba(12, 31, 25, 0.74), rgba(6, 20, 16, 0.88));
+  border: 1px solid rgba(0, 229, 154, 0.35);
   color: var(--text);
   font-family: var(--font-display);
   font-size: 0.85rem;
@@ -186,7 +296,7 @@ body {
 }
 
 [data-reality='magenta'] .btn {
-  border-color: rgba(255, 46, 147, 0.35);
+  border-color: rgba(216, 168, 78, 0.4);
 }
 
 .btn::before {
@@ -260,8 +370,8 @@ body {
 /* ---------- panels ---------- */
 
 .panel {
-  background: linear-gradient(165deg, rgba(17, 19, 42, 0.82), rgba(7, 11, 27, 0.9));
-  border: 1px solid rgba(139, 148, 176, 0.22);
+  background: linear-gradient(165deg, rgba(12, 31, 25, 0.84), rgba(6, 20, 16, 0.92));
+  border: 1px solid rgba(143, 167, 156, 0.22);
   border-top: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
   backdrop-filter: blur(14px);
   padding: 30px 38px 34px;
@@ -285,7 +395,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(248, 250, 252, 0.012) 3px 4px);
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(247, 245, 236, 0.014) 3px 4px);
   pointer-events: none;
 }
 
@@ -323,11 +433,11 @@ body {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   color: var(--text);
-  border: 1px solid rgba(139, 148, 176, 0.4);
+  border: 1px solid rgba(143, 167, 156, 0.4);
   padding: 3px 8px;
   min-width: 20px;
   text-align: center;
-  background: rgba(3, 4, 11, 0.6);
+  background: rgba(2, 7, 6, 0.6);
 }
 
 /* ---------- settings rows ---------- */
@@ -348,8 +458,8 @@ body {
   appearance: none;
   width: 46px;
   height: 22px;
-  border: 1px solid rgba(139, 148, 176, 0.4);
-  background: rgba(3, 4, 11, 0.7);
+  border: 1px solid rgba(143, 167, 156, 0.4);
+  background: rgba(2, 7, 6, 0.7);
   position: relative;
   cursor: pointer;
   transition: border-color 0.2s;
@@ -393,8 +503,8 @@ body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 6px 12px;
-  background: rgba(3, 4, 11, 0.6);
-  border: 1px solid rgba(139, 148, 176, 0.35);
+  background: rgba(2, 7, 6, 0.6);
+  border: 1px solid rgba(143, 167, 156, 0.35);
   color: var(--text-dim);
   cursor: pointer;
 }
@@ -414,7 +524,7 @@ input[type='range'].slider {
   appearance: none;
   width: 130px;
   height: 3px;
-  background: rgba(139, 148, 176, 0.35);
+  background: rgba(143, 167, 156, 0.35);
   cursor: pointer;
 }
 
@@ -484,8 +594,8 @@ input[type='range'].slider:focus-visible {
   height: 38px;
   display: grid;
   place-items: center;
-  background: rgba(7, 11, 27, 0.6);
-  border: 1px solid rgba(139, 148, 176, 0.3);
+  background: rgba(6, 20, 16, 0.62);
+  border: 1px solid rgba(143, 167, 156, 0.3);
   color: var(--text-dim);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
@@ -518,7 +628,7 @@ input[type='range'].slider:focus-visible {
   text-transform: uppercase;
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  background: rgba(7, 11, 27, 0.55);
+  background: rgba(6, 20, 16, 0.58);
   padding: 9px 16px;
   text-shadow: 0 0 12px var(--accent);
   transition: color 0.25s, border-color 0.25s;
@@ -535,7 +645,7 @@ input[type='range'].slider:focus-visible {
 .shift-cd {
   width: 74px;
   height: 3px;
-  background: rgba(139, 148, 176, 0.25);
+  background: rgba(143, 167, 156, 0.25);
   overflow: hidden;
 }
 
@@ -556,8 +666,8 @@ input[type='range'].slider:focus-visible {
 
 .energy-bar {
   height: 8px;
-  border: 1px solid rgba(139, 148, 176, 0.35);
-  background: rgba(3, 4, 11, 0.7);
+  border: 1px solid rgba(143, 167, 156, 0.35);
+  background: rgba(2, 7, 6, 0.7);
   position: relative;
   overflow: hidden;
   clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
@@ -642,11 +752,11 @@ input[type='range'].slider:focus-visible {
   white-space: nowrap;
 }
 
-.popup.near { color: var(--cyan); text-shadow: 0 0 20px var(--cyan); }
-.popup.phase { color: var(--magenta); text-shadow: 0 0 20px var(--magenta); }
-.popup.combo { color: #ffd166; text-shadow: 0 0 20px #ffd166; }
+.popup.near { color: var(--city); text-shadow: 0 0 20px var(--city); }
+.popup.phase { color: var(--desert); text-shadow: 0 0 20px var(--desert); }
+.popup.combo { color: var(--desert-warm); text-shadow: 0 0 20px var(--desert-warm); }
 .popup.system { color: var(--text); text-shadow: 0 0 16px var(--accent); font-size: 1rem; }
-.popup.warning { color: #ff4d4d; text-shadow: 0 0 24px #ff4d4d; font-size: 1.9rem; }
+.popup.warning { color: #ff7043; text-shadow: 0 0 24px #ff7043; font-size: 1.9rem; }
 
 /* hint messages */
 .hint {
@@ -712,7 +822,7 @@ input[type='range'].slider:focus-visible {
   height: 76px;
   border-radius: 50%;
   border: 1px solid var(--accent);
-  background: rgba(7, 11, 27, 0.55);
+  background: rgba(6, 20, 16, 0.58);
   color: var(--accent);
   font-family: var(--font-display);
   font-size: 0.6rem;
@@ -757,7 +867,7 @@ input[type='range'].slider:focus-visible {
 .load-bar {
   width: min(300px, 60vw);
   height: 2px;
-  background: rgba(139, 148, 176, 0.25);
+  background: rgba(143, 167, 156, 0.25);
   margin-top: 28px;
   overflow: hidden;
 }
@@ -765,8 +875,8 @@ input[type='range'].slider:focus-visible {
 .load-bar i {
   display: block;
   height: 100%;
-  background: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan);
+  background: var(--city);
+  box-shadow: 0 0 12px var(--city);
 }
 
 .load-tag {
@@ -838,14 +948,14 @@ input[type='range'].slider:focus-visible {
   font-size: 0.72rem;
   letter-spacing: 0.24em;
   color: var(--text-dim);
-  border: 1px solid rgba(139, 148, 176, 0.25);
+  border: 1px solid rgba(143, 167, 156, 0.25);
   padding: 8px 18px;
-  background: rgba(7, 11, 27, 0.5);
+  background: rgba(6, 20, 16, 0.52);
 }
 
 .best-chip b {
-  color: var(--cyan);
-  text-shadow: 0 0 10px var(--cyan);
+  color: var(--city);
+  text-shadow: 0 0 10px var(--city);
 }
 
 /* ---------- corner meta ---------- */
@@ -863,14 +973,14 @@ input[type='range'].slider:focus-visible {
 
 .high-contrast .panel,
 .high-contrast .btn {
-  background: #03040b;
+  background: #020706;
   border-color: var(--text);
 }
 
 .high-contrast .hud-label,
 .high-contrast .control-row,
 .high-contrast .setting-row {
-  color: #cfd6e8;
+  color: #dce8e1;
 }
 
 .reduced-motion *,
@@ -915,4 +1025,171 @@ input[type='range'].slider:focus-visible {
   .panel { padding: 22px; }
   .btn { min-width: 200px; }
   .hud-combo { top: 14%; right: 6%; }
+}
+
+/* ================================================================
+   Kingdom Gate theme — bilingual layout + geometric accents
+   ================================================================ */
+
+/* Buttons carrying a stacked Arabic/Latin label need a taller box, and the
+   Arabic line must not inherit the Latin tracking or text-indent. */
+.btn .bi {
+  gap: 3px;
+}
+
+.btn .bi .ar {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-indent: 0;
+  opacity: 1;
+}
+
+.btn .bi .en {
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  opacity: 0.82;
+}
+
+.btn:has(.bi) {
+  padding: 12px 30px;
+  letter-spacing: normal;
+  text-indent: 0;
+}
+
+/* An eight-point star tessellation, the classic Islamic geometric motif,
+   rendered purely with gradients so it costs nothing at runtime. */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image:
+    repeating-linear-gradient(45deg, var(--accent) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg, var(--accent) 0 1px, transparent 1px 22px);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 55%);
+}
+
+/* Gold hairline framing the top of every glass panel. */
+.panel {
+  border-top-width: 2px;
+}
+
+/* Menu title block */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Reality chip: Arabic label leads, Latin follows in smaller caps. */
+.reality-chip .ar {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.reality-chip .en {
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  opacity: 0.75;
+}
+
+/* HUD labels pair a small Arabic word with the Latin caption. */
+.hud-label .ar {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  opacity: 0.95;
+}
+
+.hud-label .en {
+  letter-spacing: 0.3em;
+}
+
+/* Stat blocks on the game-over screen */
+.stat .hud-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* Popup callouts render Arabic above the Latin shout line. */
+.popup .ar {
+  display: block;
+  font-family: var(--font-ar);
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-indent: 0;
+  opacity: 0.9;
+  margin-bottom: 2px;
+}
+
+/* Intro beats */
+.intro-text-ar {
+  font-family: var(--font-ar);
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: normal;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  text-shadow: 0 0 24px var(--accent);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.intro-beat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Panel headings carry the Arabic inline after the Latin. */
+.panel h2 .ar {
+  font-size: 0.78rem;
+  letter-spacing: normal;
+  margin-left: 12px;
+  opacity: 0.8;
+  color: var(--desert-warm);
+}
+
+/* Control and setting rows keep Arabic inline beside the Latin label so the
+   panel stays compact enough to fit without scrolling. */
+.control-row .action {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.control-row .action .ar {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.setting-row .label-ar {
+  font-family: var(--font-ar-body);
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: normal;
+  text-transform: none;
+  font-size: 0.72rem;
+  opacity: 0.7;
+  margin-left: 10px;
+}
+
+/* Game-over stat captions need a little more air between the two scripts. */
+.stat .hud-label {
+  gap: 9px;
+}
+
+/* Desert reality warms the ambient screen-edge glow. */
+[data-reality='magenta'] .fx-edge {
+  box-shadow: inset 0 0 130px color-mix(in srgb, var(--desert) 30%, transparent);
 }
